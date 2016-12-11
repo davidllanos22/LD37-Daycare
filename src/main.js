@@ -5,7 +5,7 @@ wizard({
     fillScreen: true,
     pixelArt: true,
     create: function(){
-        this.loadImages("arm.png", "body.png", "head.png", "leg.png", "tiles.png");
+        this.loadImages("arm.png", "body.png", "head.png", "leg.png", "tiles.png", "hair.png");
 
         WIZARD.spritesheet.create("tiles", 40, 40);
 
@@ -13,6 +13,7 @@ wizard({
         WIZARD.spritesheet.create("body", 40, 39);
         WIZARD.spritesheet.create("head", 48, 35);
         WIZARD.spritesheet.create("leg", 14, 18);
+        WIZARD.spritesheet.create("hair", 46, 40);
 
         WIZARD.scene.create("testRoom", testRoom);
 

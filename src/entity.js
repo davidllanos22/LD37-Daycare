@@ -5,6 +5,7 @@ var animations = {
         this.a += 0.04;
     },
     hello: function(entity){
+        entity.leftArmState = 0;
         entity.armLeftRot += 4 + Math.sin(this.a);
     },
     walk: function(entity){
@@ -13,7 +14,7 @@ var animations = {
         entity.armRightRot += Math.sin(this.a) / 4;
         entity.legLeftRot += Math.sin(this.a) / 2;
         entity.legRightRot += Math.cos(this.a) / 2;
-        entity.headRot += Math.cos(this.a) / 5;
+        entity.headRot += Math.cos(this.a) / 9;
     },
     stopWalk: function(entity){
         // entity.armRightRot = WIZARD.math.lerp(entity.armRightRot, entity.baseArmRightRot, 0.05);
@@ -28,17 +29,20 @@ var entityPlayer = function(params){
 
     this.solid = WIZARD.physics.createAABB(this.x, this.y, 40, 20);
 
-    this.bodyStyle = 0;
     this.headStyle = 0;
+    this.hairStyle = 0;
+    this.clothStyle = 0;
     this.armStyle = 0;
     this.legStyle = 0;
 
     this.speed = 0.5;
 
+    var baseArmRot = WIZARD.math.randomBetween(50.1, 50.15);
+
     this.baseBodyRot = 0;
     this.baseHeadRot = 0;
-    this.baseArmLeftRot = -50;
-    this.baseArmRightRot = -50;
+    this.baseArmLeftRot = -baseArmRot;
+    this.baseArmRightRot = baseArmRot;
     this.baseLegLeftRot = 0;
     this.baseLegRightRot = 0;
 
@@ -49,15 +53,28 @@ var entityPlayer = function(params){
     this.legLeftRot = this.baseLegLeftRot;
     this.legRightRot = this.baseLegRightRot;
 
+    this.leftArmState = 1;
+    this.rightArmState = 1;
+
     var left, right, up, down, attack, interact;
     this.salute = false;
 
 
     this.createRandomAppearance = function(){
-        this.bodyStyle = Math.floor(WIZARD.math.randomBetween(0, 2));
-        this.headStyle = Math.floor(WIZARD.math.randomBetween(0, 2));
-        this.armStyle = Math.floor(WIZARD.math.randomBetween(0, 2));
-        this.legStyle = Math.floor(WIZARD.math.randomBetween(0, 2));
+        var numStyles = 2;
+        var numColors = 3;
+
+        var numHairs = 3;
+
+        var color = Math.floor(WIZARD.math.randomBetween(0, numColors));
+        var style = Math.floor(WIZARD.math.randomBetween(0, numStyles));
+
+        this.hairStyle = Math.floor(WIZARD.math.randomBetween(0, numHairs));
+        this.headStyle = Math.floor(WIZARD.math.randomBetween(0, numStyles));
+        if(Math.random() > 0.5)this.armAndLegStyle = 0;
+        else this.legStyle = color + 1;
+        this.armStyle = color + 1;
+        this.clothStyle = color * numStyles + style;
     };
 
     this.createRandomAppearance();
@@ -98,6 +115,8 @@ var entityPlayer = function(params){
     };
 
     this.resetRotations = function(){
+        this.leftArmState = 1;
+        this.leftArmState = 1;
         this.bodyRot = WIZARD.math.lerp(this.bodyRot, this.baseBodyRot, 0.05);
         this.headRot = WIZARD.math.lerp(this.headRot, this.baseHeadRot, 0.05);
         this.armLeftRot = WIZARD.math.lerp(this.armLeftRot, this.baseArmLeftRot, 0.05);
@@ -169,7 +188,7 @@ var entityPlayer = function(params){
             var xx = WIZARD.math.lerp(WIZARD.camera.x, this.x - 3.5 - wiz.width / 2, 1);
             var yy = WIZARD.math.lerp(WIZARD.camera.y, this.y - wiz.height / 2 - 12, 1);
 
-            WIZARD.camera.setPosition(xx, yy);
+            WIZARD.camera.setPosition(xx, Math.floor(yy));
         }
 
         if (moving) animations.walk(this);
@@ -183,15 +202,18 @@ var entityPlayer = function(params){
     };
 
     this.render = function(wiz){
-        wiz.drawSprite("tiles", this.x - 20, this.y + 12, 8, 9);
-        wiz.drawImageRot("leg", this.x - 11, this.y + 14, this.bodyRot +  this.legLeftRot, 0.5, 0, this.legStyle, 0);
-        wiz.drawImageRot("leg", this.x + 11, this.y + 14, this.bodyRot -  this.legRightRot, 0.5, 0, this.legStyle, 0, true);
-        wiz.drawImageRot("body", this.x, this.y, this.bodyRot, 0.5, 0.5, this.bodyStyle, 0);
+        wiz.drawSprite("tiles", this.x - 20, this.y + 12, 8, 9); //shadow
 
-        wiz.drawImageRot("head", this.x - 1, this.y - 19, this.bodyRot + this.headRot, 0.5, 1, this.headStyle, 0);
-        wiz.drawImageRot("arm", this.x - 12, this.y - 14, this.bodyRot + this.armLeftRot, 1, 0.5, this.armStyle, 0);
-        wiz.drawImageRot("arm", this.x + 12, this.y - 14, this.bodyRot - this.armRightRot, 1, 0.5, this.armStyle, 0, true);
+        wiz.drawImageRot("leg", this.x - 11, this.y + 14, this.legLeftRot, 0.5, 0, this.legStyle, 0);
+        wiz.drawImageRot("leg", this.x + 11, this.y + 14, this.legRightRot, 0.5, 0, this.legStyle, 0, true);
 
+        wiz.drawImageRot("body", this.x, this.y, this.bodyRot, 0.5, 0.5, this.clothStyle, 0);
+
+        wiz.drawImageRot("head", this.x - 1, this.y - 19, this.headRot, 0.5, 1, this.headStyle, 0);
+        wiz.drawImageRot("hair", this.x - 1, this.y - 34, this.headRot * 2, 0.5, 1, this.hairStyle, 0);
+
+        wiz.drawImageRot("arm", this.x - 11, this.y - 14, this.armLeftRot, 1, 0.5, this.armStyle, this.leftArmState);
+        wiz.drawImageRot("arm", this.x + 12, this.y - 14, this.armRightRot, 1, 0.5, this.armStyle, this.rightArmState, true);
 
         if(DEBUG)wiz.drawAABB(this.solid, "red");
     }
@@ -213,6 +235,7 @@ var tileEntity = function(params){
 
 var solidEntity = function(params){
     this.solid = WIZARD.physics.createAABB(params.x, params.y, params.w, params.h);
+    this.skipSorting = true;
 
     this.update = function(wiz){
     };
