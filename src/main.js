@@ -5,7 +5,8 @@ wizard({
     fillScreen: true,
     pixelArt: true,
     create: function(){
-        this.loadImages("arm.png", "body.png", "head.png", "leg.png", "tiles.png", "hair.png");
+        this.loadImages("arm.png", "body.png", "head.png", "leg.png", "tiles.png", "hair.png", "pickup.png", "balls.png");
+        this.loadSounds("pickup.wav");
 
         WIZARD.spritesheet.create("tiles", 40, 40);
 
@@ -15,11 +16,16 @@ wizard({
         WIZARD.spritesheet.create("leg", 14, 18);
         WIZARD.spritesheet.create("hair", 46, 40);
 
+        WIZARD.spritesheet.create("balls", 9, 9);
+        WIZARD.spritesheet.create("pickup", 60, 60);
+
         WIZARD.scene.create("testRoom", testRoom);
 
         WIZARD.entity.create("player", entityPlayer);
         WIZARD.entity.create("tile", tileEntity);
         WIZARD.entity.create("solid", solidEntity);
+        WIZARD.entity.create("pickup", pickupEntity);
+        WIZARD.entity.create("bullet", bulletEntity);
 
         WIZARD.map.create("testMap", testMap);
         WIZARD.map.loadToScene("testMap", "testRoom", mapLoader);
